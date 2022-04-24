@@ -1,0 +1,93 @@
+Deploy steps :
+
+
+create new app in heroku name it .
+
+remove .git 
+
+add client inside server folder 
+
+const PORT = process.env.PORT || 8000;
+in the app.js
+
+//for deploy just after above line need to paste this 
+
+
+//for deploy
+
+if ((process.env.NODE_ENV = "production")) {
+  app.use(express.static("client/build"));
+  const path = require("path");
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
+
+remove proxy if any in server 
+also remove localhost line in frontent ...only keep end points of api
+
+now need to add heroku script in package.json in server
+and node app.js in start script
+
+ "start": "node app.js",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+    
+	
+make build of client 
+npm run build 
+
+after build go to server and open cmd 
+and type :
+heroku login	
+
+after that copy the lines from heroku and run one by one in cmd
+
+cd my-project/
+$ git init
+$ heroku git:remote -a blogapp-mern-project
+Deploy your application
+Commit your code to the repository and deploy it to Heroku using Git.
+
+$ git add .
+$ git commit -am "make it better"
+$ git push heroku main
+
+
+add key value in config vars in heroku add secret key and database_url
+
+
+
+
+//app.jsv correct order and file 
+
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const app = express();
+
+const connectDB = require("./db/mongoose");
+const router = require("./routes/blogs");
+connectDB();
+dotenv.config();
+app.use(cors());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(router);
+
+const PORT = process.env.PORT || 8000;
+
+if ((process.env.NODE_ENV = "production")) {
+  app.use(express.static("client/build"));
+  const path = require("path");
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
+
+app.listen(PORT, () => {
+  console.log(`port is listening ${PORT}`);
+});
+
